@@ -125,7 +125,9 @@
         "eks:AssociateAccessPolicy",
         "eks:ListAssociatedAccessPolicies",
         "eks:DescribeAccessEntry",
-        "eks:ListNodegroups"
+        "eks:ListNodegroups",
+        "eks:UpdateClusterConfig",
+        "eks:UpdateAddon"
       ],
       "Resource": "*"
     }
