@@ -103,6 +103,8 @@
         "eks:ListNodegroups",
         "eks:DescribeAccessEntry",
         "eks:ListNodegroups",
+        "eks:UpdateClusterConfig",
+        "eks:UpdateAddon",
         "elasticloadbalancing:DeleteLoadBalancer",
         "elasticloadbalancing:DescribeLoadBalancers",
         "route53:DeleteHostedZone",
