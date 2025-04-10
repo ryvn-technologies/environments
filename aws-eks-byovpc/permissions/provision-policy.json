@@ -126,6 +126,8 @@
         "eks:ListAssociatedAccessPolicies",
         "eks:DescribeAccessEntry",
         "eks:ListNodegroups",
+        "eks:UpdateClusterConfig",
+        "eks:UpdateAddon",
         "route53:CreateHostedZone",
         "route53:GetHostedZone",
         "route53:ListHostedZones",
