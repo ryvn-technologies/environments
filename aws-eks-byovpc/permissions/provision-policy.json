@@ -125,7 +125,16 @@
         "eks:AssociateAccessPolicy",
         "eks:ListAssociatedAccessPolicies",
         "eks:DescribeAccessEntry",
-        "eks:ListNodegroups"
+        "eks:ListNodegroups",
+        "route53:CreateHostedZone",
+        "route53:GetHostedZone",
+        "route53:ListHostedZones",
+        "route53:ChangeTagsForResource",
+        "route53:ListResourceRecordSets",
+        "route53:ListTagsForResource",
+        "route53:GetChange",
+        "route53:ChangeResourceRecordSets",
+        "route53:GetDNSSEC"
       ],
       "Resource": "*"
     }
