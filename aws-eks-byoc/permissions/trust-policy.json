@@ -1,0 +1,23 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::703671917981:role/RyvnManagerRole"
+      },
+      "Action": ["sts:AssumeRole", "sts:TagSession"]
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com",
+          "eks.amazonaws.com",
+          "pods.eks.amazonaws.com"
+        ]
+      },
+      "Action": ["sts:AssumeRole", "sts:TagSession"]
+    }
+  ]
+}
