@@ -136,7 +136,18 @@
         "route53:ListTagsForResource",
         "route53:GetChange",
         "route53:ChangeResourceRecordSets",
-        "route53:GetDNSSEC"
+        "route53:GetDNSSEC",
+        "events:TagResource",
+        "events:PutRule",
+        "events:DescribeRule",
+        "events:ListTagsForResource",
+        "events:ListTargetsByRule",
+        "events:PutTargets",
+        "sqs:createqueue",
+        "sqs:tagqueue", 
+        "sqs:getqueueattributes",
+        "sqs:setqueueattributes",
+        "sqs:listqueuetags"
       ],
       "Resource": "*"
     }
