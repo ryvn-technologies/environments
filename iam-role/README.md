@@ -67,7 +67,7 @@ terraform apply
 ## Required Variables
 
 - `environment` (string): Environment to use. Valid values:
-  - `aws-eks`
+  - `aws-eks-byoc`
   - `aws-eks-byovpc`
 
 ## Optional Variables
