@@ -5,7 +5,6 @@
       "Sid": "VpcScopedTeardown",
       "Effect": "Allow",
       "Action": [
-        "ec2:DeleteNatGateway",
         "ec2:DeleteRoute",
         "ec2:DeleteRouteTable",
         "ec2:DeleteSecurityGroup",
@@ -17,6 +16,19 @@
       "Condition": {
         "StringEquals": {
           "ec2:Vpc": "arn:aws:ec2:${region}:${account_id}:vpc/${vpc_id}"
+        }
+      }
+    },
+    {
+      "Sid": "NatGatewayTeardown",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DeleteNatGateway"
+      ],
+      "Resource": "arn:aws:ec2:${region}:${account_id}:natgateway/*",
+      "Condition": {
+        "StringLike": {
+          "aws:ResourceTag/Cluster": "ryvn-*"
         }
       }
     },
@@ -46,9 +58,6 @@
         "ec2:DisassociateAddress",
         "ec2:DisassociateRouteTable",
         "ec2:ReleaseAddress",
-        "ecr:DeleteRepository",
-        "ecr:DescribeRepositories",
-        "ecr:ListTagsForResource",
         "eks:DeleteAccessEntry",
         "eks:DeleteAddon",
         "eks:DeleteCluster",
@@ -67,24 +76,18 @@
         "eks:ListTagsForResource",
         "eks:UpdateAddon",
         "eks:UpdateClusterConfig",
-        "elasticloadbalancing:DeleteLoadBalancer",
-        "elasticloadbalancing:DescribeLoadBalancers",
         "events:DeleteRule",
         "events:DescribeRule",
         "events:ListTagsForResource",
         "events:ListTargetsByRule",
         "events:RemoveTargets",
-        "iam:DeleteGroupPolicy",
         "iam:DeleteInstanceProfile",
         "iam:DeleteOpenIDConnectProvider",
         "iam:DeletePolicy",
         "iam:DeletePolicyVersion",
         "iam:DeleteRole",
         "iam:DeleteRolePolicy",
-        "iam:DeleteUserPolicy",
-        "iam:DetachGroupPolicy",
         "iam:DetachRolePolicy",
-        "iam:DetachUserPolicy",
         "iam:GetGroupPolicy",
         "iam:GetInstanceProfile",
         "iam:GetOpenIDConnectProvider",
@@ -109,7 +112,6 @@
         "iam:UntagOpenIDConnectProvider",
         "iam:UntagPolicy",
         "iam:UntagRole",
-        "iam:UntagUser",
         "kms:DeleteAlias",
         "kms:DescribeKey",
         "kms:GetKeyPolicy",

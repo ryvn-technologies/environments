@@ -53,9 +53,24 @@ aws ec2 create-subnet --vpc-id <vpc_id> --cidr-block <unused-cidr> --dry-run
 # UnauthorizedOperation => denied
 ```
 
-### Known gap
+### Scoping what `ec2:Vpc` cannot reach
 
-`byo-vpc-deprovision-policy.json` still lists `ec2:DeleteNatGateway` in its `ec2:Vpc`-conditioned `VpcScopedTeardown` statement. `ec2:Vpc` is not supported on the `natgateway` resource type, so that grant is inert and NAT gateway teardown will be denied. Fixing it means granting `ec2:DeleteNatGateway` on `natgateway/*`, which cannot be VPC-scoped by any condition.
+`natgateway` and `elastic-ip` support no `ec2:Vpc` condition key at all, so NAT and EIP actions cannot be confined to the customer VPC. They do support tag conditions, which is the alternative lever:
+
+- `ec2:DeleteNatGateway` — `aws:ResourceTag/${TagKey}`, `ec2:ResourceTag/${TagKey}`
+- `ec2:ReleaseAddress`, `ec2:DisassociateAddress` — the same, plus `ec2:AllocationId`, `ec2:Domain`, `ec2:PublicIpAddress`
+- `ec2:CreateNatGateway`, `ec2:AllocateAddress` — `aws:RequestTag/${TagKey}`, `aws:TagKeys` on the resource being created
+
+`byo-vpc-deprovision-policy.json` uses this for `NatGatewayTeardown`, conditioned on `aws:ResourceTag/Cluster` matching `ryvn-*` — the `Cluster` tag that `infra/aws-provision-karpenter/main.tf` applies to everything it creates.
+
+**The pattern must be `ryvn-*`, not `ryvn-eks-*`.** `local.cluster_name` (`main.tf:99-104`) is `ryvn-eks-${environment_name}` only while that is 36 characters or fewer; beyond that the prefix is rewritten to `ryvn-` and the value truncated to 36. A `ryvn-eks-*` pattern silently excludes every long-named environment, leaving an undeletable — and billed — NAT gateway behind.
+
+This is an interim measure on two counts. `Cluster` is a tag a customer could also set, so it bounds blast radius rather than proving ownership; and a prefix match is inherently looser than an ownership assertion. The durable fix is a dedicated constant-valued tag (`ryvn.app/managed = "true"`) enforced at create time via `aws:RequestTag` and required at destroy time via `aws:ResourceTag`, which permits `StringEquals` instead of `StringLike` and closes the loop for NAT, EIPs *and* the wildcard child-resource grants. Tracked in ENG-1468.
+
+### Known gaps
+
+- `ec2:ReleaseAddress` and `ec2:DisassociateAddress` are still granted on `Resource: *` in `DeprovisionInfrastructure`. They are tag-scopable in principle, but `DisassociateAddress` also takes a `network-interface` resource, so narrowing it needs two coordinated statements and a verified teardown — deferred to ENG-1468 rather than risking a stuck deprovision.
+- The `ryvn-eks-*` prefix match assumes the NAT gateway actually carries the `Cluster` tag. If a teardown is ever denied on `ec2:DeleteNatGateway`, check the tag first; the previous behaviour was an unconditional denial, so this can only be an improvement, but it is not yet verified against a real create-NAT teardown.
 
 ## BYO-VPC vs Standard
 
@@ -68,4 +83,6 @@ Policies were captured via IAM Access Analyzer + CloudTrail during live provisio
 Two consequences worth knowing when editing these files:
 
 - Access Analyzer infers conditions from observed calls **without checking they are satisfiable** — it produced the unsatisfiable `ec2:Vpc`-on-create grants described above. Treat generated conditions as a starting point and probe them.
-- Capture also picks up grants with no consumer in the Terraform. IAM user/group writes, `ec2:RunInstances`, `ec2:AuthorizeClientVpnIngress` and ECR/ELB actions were all present without any resource of that type being declared by `infra/aws-provision-karpenter`; they have since been removed. Before adding an action, confirm something actually calls it.
+- Capture also picks up grants with no consumer in the Terraform. IAM user/group **writes**, `ec2:RunInstances`, `ec2:AuthorizeClientVpnIngress` and ECR/ELB actions were present in all four policy files without any resource of that type being declared by `infra/aws-provision-karpenter` or `infra/aws-provision`; they have since been removed. Before adding an action, confirm something actually calls it.
+
+The read-only IAM user/group actions (`GetUser`, `GetUserPolicy`, `GetGroupPolicy`, `ListAttachedUserPolicies`, `ListUserPolicies`, `ListUserTags`, `ListAttachedGroupPolicies`) are deliberately kept: they appear in the capture, cannot escalate privilege, and ruling out every provider-internal read is not worth a 403 mid-provision.
