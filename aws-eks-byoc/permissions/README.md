@@ -8,8 +8,10 @@ IAM policies for the `RyvnAccessRole` used to provision and deprovision BYOC (EK
 |------|------|-------------|
 | `provision-policy.json` | Standard | Full VPC + EKS provisioning |
 | `deprovision-policy.json` | Standard | Full VPC + EKS teardown |
-| `byo-vpc-provision-policy.json` | BYO-VPC | EKS provisioning within customer-provided VPC |
-| `byo-vpc-deprovision-policy.json` | BYO-VPC | EKS teardown within customer-provided VPC |
+| `byo-vpc-provision-policy.json` | BYO-VPC (carve) | EKS provisioning within customer-provided VPC, Ryvn carving its own subnets |
+| `byo-vpc-deprovision-policy.json` | BYO-VPC (carve) | EKS teardown within customer-provided VPC |
+| `byo-subnets-provision-policy.json` | BYO-subnets | EKS provisioning into pre-existing customer subnets, creating no network topology |
+| `byo-subnets-deprovision-policy.json` | BYO-subnets | EKS teardown that leaves the customer's network untouched |
 | `trust-policy.json` | All | Trust relationship for role assumption |
 
 ## BYO-VPC Policies
@@ -71,6 +73,53 @@ This is an interim measure on two counts. `Cluster` is a tag a customer could al
 
 - `ec2:ReleaseAddress` and `ec2:DisassociateAddress` are still granted on `Resource: *` in `DeprovisionInfrastructure`. They are tag-scopable in principle, but `DisassociateAddress` also takes a `network-interface` resource, so narrowing it needs two coordinated statements and a verified teardown — deferred to ENG-1468 rather than risking a stuck deprovision.
 - The `ryvn-eks-*` prefix match assumes the NAT gateway actually carries the `Cluster` tag. If a teardown is ever denied on `ec2:DeleteNatGateway`, check the tag first; the previous behaviour was an unconditional denial, so this can only be an improvement, but it is not yet verified against a real create-NAT teardown.
+
+## BYO-subnets policies
+
+Use these when the environment sets `existing_workload_subnet_ids` — Ryvn consumes subnets the
+customer already created and creates **no** network topology. They are the same as the BYO-VPC
+policies with every network-mutating action removed:
+
+- No `ec2:CreateSubnet`, `ec2:CreateRouteTable`, `ec2:CreateRoute`, `ec2:AssociateRouteTable`,
+  `ec2:CreateNatGateway`, `ec2:AllocateAddress`, `ec2:ModifySubnetAttribute`.
+- No `ec2:DeleteSubnet`, `ec2:DeleteRoute`, `ec2:DeleteRouteTable`, `ec2:DisassociateRouteTable`,
+  `ec2:DeleteNatGateway`, `ec2:ReleaseAddress`, `ec2:DisassociateAddress` on teardown.
+- Security group create/authorize/revoke stay, VPC-scoped: Ryvn still owns the cluster and node
+  security groups. `ec2:CreateTags` stays, because Ryvn tags the resources it does create (EKS
+  cluster, launch templates, security groups, KMS keys) — it does not tag the customer's subnets.
+
+This is not merely least privilege. In a centrally-managed landing zone the network-mutating
+actions are often denied by an **SCP in the organization's management account**, which no policy
+or permissions boundary on `RyvnAccessRole` can override. In that situation carve mode cannot
+work at all and BYO-subnets mode is the only option; these files are the action set that is
+actually grantable there.
+
+### `${partition}` placeholder
+
+Unlike the BYO-VPC files, these use `${partition}` instead of a literal `aws` in every ARN.
+Substitute `aws` in commercial regions, `aws-us-gov` in GovCloud, `aws-cn` in China. A literal
+`arn:aws:` in a GovCloud policy matches nothing, and the statement then contributes no Allow —
+the same silent-denial failure mode as the `ec2:Vpc` issue above.
+
+### Confirm the deny is an SCP and not this policy
+
+An identity-policy gap and an SCP deny look identical from the caller's side
+(`UnauthorizedOperation`). Distinguish them without mutating anything:
+
+```bash
+# Authorized by identity policy AND allowed by SCP => DryRunOperation
+aws ec2 create-subnet --vpc-id <vpc_id> --cidr-block <unused-cidr> --dry-run
+aws ec2 create-route-table --vpc-id <vpc_id> --dry-run
+aws ec2 create-security-group --vpc-id <vpc_id> --group-name probe --description probe --dry-run
+```
+
+If `create-security-group` dry-runs successfully while `create-subnet` and `create-route-table` do
+not, the identity policy is fine and the denial is above the account — BYO-subnets mode is the
+answer, not a policy edit. `aws organizations describe-policy` from the management account (if you
+have that access) names the SCP; from the workload account, the dry-run contrast is the evidence.
+
+Note that dry-run coverage is uneven: `eks:CreateCluster` has no dry-run, so "can EKS itself be
+created here?" cannot be answered this way and is confirmed only by provisioning.
 
 ## BYO-VPC vs Standard
 
