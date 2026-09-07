@@ -2,6 +2,8 @@
 
 This repository contains Terraform modules for provisioning and managing Ryvn environments on AWS. It provides infrastructure-as-code solutions for setting up EKS clusters with different configuration options.
 
+For GCP GKE environments, it also includes [IAM permissions and setup instructions](gcp-gke-byoc/permissions/README.md).
+
 ## Available Modules
 
 ### IAM Role Module
@@ -17,16 +19,25 @@ For detailed usage instructions, see the [IAM Role Module README](iam-role/READM
 The repository supports the following environment types:
 - `aws-eks-byoc` - AWS EKS with Bring Your Own Cloud
 - `aws-eks-byovpc` - AWS EKS with Bring Your Own VPC
+- `gcp-gke-byoc` - GCP GKE with Bring Your Own Cloud
 
 Each environment type includes specific IAM permissions and configurations required for provisioning and managing the environment.
 
 ## Prerequisites
 
+For AWS:
+
 - Terraform >= 1.0
 - AWS Provider
 - AWS CLI configured with appropriate credentials
 
+For GCP:
+
+- gcloud CLI signed in to the target project
+
 ## Quick Start
+
+### AWS
 
 1. Choose the appropriate module for your needs
 2. Follow the module-specific README for detailed setup instructions
@@ -41,12 +52,19 @@ module "iam-role" {
 }
 ```
 
+### GCP
+
+Follow the [GCP setup instructions](gcp-gke-byoc/permissions/README.md) and review the [provisioned resources](gcp-gke-byoc/resources/provisioned-resources.md).
+
 ## Repository Structure
 
 ```
 .
 ├── aws-eks-byoc/          # BYOC environment configuration
 │   └── permissions/       # IAM permissions for BYOC
+├── gcp-gke-byoc/          # GCP GKE environment
+│   ├── permissions/       # Custom IAM role and gcloud setup
+│   └── resources/         # What Ryvn creates in your project
 ├── iam-role/             # IAM role module
 │   ├── README.md         # Module documentation
 │   └── *.tf              # Terraform configuration files
