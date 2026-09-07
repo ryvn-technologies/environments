@@ -1,0 +1,135 @@
+# See README.md for setup.
+title: Ryvn Provisioner
+description: Provision, update and deprovision a Ryvn GKE environment.
+stage: GA
+includedPermissions:
+  # Project and API enablement
+  - resourcemanager.projects.get
+  - resourcemanager.projects.getIamPolicy
+  - resourcemanager.projects.setIamPolicy
+  - serviceusage.services.enable
+  - serviceusage.services.get
+  - serviceusage.services.list
+  - serviceusage.operations.get
+  # Compute lookups and operations
+  - compute.projects.get
+  - compute.regions.get
+  - compute.regions.list
+  - compute.zones.get
+  - compute.zones.list
+  - compute.globalOperations.get
+  - compute.regionOperations.get
+  - compute.zoneOperations.get
+  # VPC, subnet, firewall rules
+  - compute.networks.create
+  - compute.networks.delete
+  - compute.networks.get
+  - compute.networks.list
+  - compute.networks.update
+  - compute.networks.updatePolicy
+  - compute.networks.use
+  - compute.networks.addPeering
+  - compute.networks.removePeering
+  - compute.networks.updatePeering
+  - compute.subnetworks.create
+  - compute.subnetworks.delete
+  - compute.subnetworks.get
+  - compute.subnetworks.list
+  - compute.subnetworks.update
+  - compute.subnetworks.setPrivateIpGoogleAccess
+  - compute.subnetworks.use
+  - compute.firewalls.create
+  - compute.firewalls.delete
+  - compute.firewalls.get
+  - compute.firewalls.list
+  - compute.firewalls.update
+  # Cloud NAT
+  - compute.addresses.create
+  - compute.addresses.delete
+  - compute.addresses.get
+  - compute.addresses.list
+  - compute.addresses.setLabels
+  - compute.addresses.use
+  - compute.routers.create
+  - compute.routers.delete
+  - compute.routers.get
+  - compute.routers.list
+  - compute.routers.update
+  # Private Services Access
+  - compute.globalAddresses.create
+  - compute.globalAddresses.createInternal
+  - compute.globalAddresses.delete
+  - compute.globalAddresses.deleteInternal
+  - compute.globalAddresses.get
+  - compute.globalAddresses.list
+  - compute.globalAddresses.setLabels
+  - compute.globalAddresses.use
+  - servicenetworking.services.addPeering
+  - servicenetworking.services.deleteConnection
+  - servicenetworking.services.get
+  - servicenetworking.operations.get
+  # GKE cluster and node pools
+  - container.clusters.create
+  - container.clusters.delete
+  - container.clusters.get
+  - container.clusters.list
+  - container.clusters.update
+  - container.operations.get
+  - container.operations.list
+  # Node pool instance groups
+  - compute.instanceGroupManagers.get
+  # Service accounts and Workload Identity
+  - iam.serviceAccounts.create
+  - iam.serviceAccounts.delete
+  - iam.serviceAccounts.get
+  - iam.serviceAccounts.list
+  - iam.serviceAccounts.update
+  - iam.serviceAccounts.getIamPolicy
+  - iam.serviceAccounts.setIamPolicy
+  - iam.serviceAccounts.actAs
+  # Custom IAM roles
+  - iam.roles.create
+  - iam.roles.delete
+  - iam.roles.get
+  - iam.roles.list
+  - iam.roles.undelete
+  - iam.roles.update
+  # Cloud SQL access tags
+  - resourcemanager.tagKeys.create
+  - resourcemanager.tagKeys.delete
+  - resourcemanager.tagKeys.get
+  - resourcemanager.tagKeys.list
+  - resourcemanager.tagKeys.update
+  - resourcemanager.tagValues.create
+  - resourcemanager.tagValues.delete
+  - resourcemanager.tagValues.get
+  - resourcemanager.tagValues.list
+  - resourcemanager.tagValues.update
+  # Cloud DNS
+  - dns.managedZones.create
+  - dns.managedZones.delete
+  - dns.managedZones.get
+  - dns.managedZones.list
+  - dns.managedZones.update
+  - dns.managedZoneOperations.get
+  - dns.changes.create
+  - dns.changes.get
+  - dns.changes.list
+  - dns.resourceRecordSets.create
+  - dns.resourceRecordSets.delete
+  - dns.resourceRecordSets.get
+  - dns.resourceRecordSets.list
+  - dns.resourceRecordSets.update
+  - dns.networks.bindPrivateDNSZone
+  # Cloud KMS
+  - cloudkms.keyRings.create
+  - cloudkms.keyRings.get
+  - cloudkms.keyRings.list
+  - cloudkms.cryptoKeys.create
+  - cloudkms.cryptoKeys.get
+  - cloudkms.cryptoKeys.list
+  - cloudkms.cryptoKeys.update
+  - cloudkms.cryptoKeys.getIamPolicy
+  - cloudkms.cryptoKeys.setIamPolicy
+  - cloudkms.cryptoKeyVersions.list
+  - cloudkms.cryptoKeyVersions.destroy
