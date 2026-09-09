@@ -12,13 +12,15 @@ The `iam-role` Terraform module creates an IAM role named `RyvnAccessRole` with 
 
 The Ryvn dashboard shows the `gcloud` commands that create the `ryvn-provisioner` service account, grant it the Ryvn Provisioner custom role plus Kubernetes Engine Admin, and let Ryvn impersonate it without any keys. The role definition is served by the Ryvn API, so the commands always match the Ryvn instance you use.
 
+See the [GCP IAM permissions](gcp-gke-byoc/permissions/README.md) and [provisioned resources](gcp-gke-byoc/resources/provisioned-resources.md).
+
 ## Environment types
 
 - `aws-eks-byoc`: AWS EKS, bring your own cloud
 - `aws-eks-byovpc`: AWS EKS, bring your own VPC
 - `gcp-gke-byoc`: GCP GKE, bring your own cloud
 
-The `aws-eks-byoc` and `gcp-gke-byoc` directories each have a `resources/` folder listing what Ryvn creates; `aws-eks-byoc` also has a `permissions/` folder with the IAM policies Ryvn needs. The BYO-VPC policies live alongside the standard ones in `aws-eks-byoc/permissions`.
+The `aws-eks-byoc` and `gcp-gke-byoc` directories each have a `resources/` folder listing what Ryvn creates and a `permissions/` folder with the IAM permissions Ryvn needs. The BYO-VPC policies live alongside the standard ones in `aws-eks-byoc/permissions`.
 
 ## Prerequisites
 
@@ -52,6 +54,7 @@ GCP: open the environment in the Ryvn dashboard and run the `gcloud` commands it
 │   ├── permissions/       # IAM policies for RyvnAccessRole
 │   └── resources/         # What Ryvn creates in your account
 ├── gcp-gke-byoc/          # GCP GKE environment
+│   ├── permissions/       # IAM permissions and setup
 │   └── resources/         # What Ryvn creates in your project
 ├── iam-role/              # Terraform module for the AWS role
 │   ├── README.md

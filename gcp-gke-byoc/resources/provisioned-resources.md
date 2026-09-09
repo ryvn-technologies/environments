@@ -1,14 +1,14 @@
-# Provisioned Resources
+# Provisioned resources
 
-Resources Ryvn creates in your project when it provisions a GKE environment. Everything is created
-by the `ryvn-provisioner` service account, and names carry the environment name as a suffix.
+Resources Ryvn creates in your project when it provisions a GKE environment.
+The counts and sizes below reflect the default configuration.
 
 ## APIs
 
 | API | Description |
 |-----|-------------|
 | `servicenetworking.googleapis.com` | Enabled during provisioning if not already on (Private Services Access) |
-| `cloudkms.googleapis.com` | Enabled during provisioning if not already on (secrets encryption) |
+| `cloudkms.googleapis.com` | Enabled during provisioning if not already on, when Ryvn creates a key for secrets encryption |
 
 ## Networking
 
@@ -27,17 +27,20 @@ by the `ryvn-provisioner` service account, and names carry the environment name 
 
 | Resource | Count | Description |
 |----------|-------|-------------|
-| GKE cluster (`ryvn-gke-<env>`) | 1 | Regional, private nodes, private control plane endpoint (Ryvn bootstraps through the DNS-based endpoint, gated by IAM), VPC-native, Workload Identity enabled, Dataplane V2 (optional), secrets encrypted with the Cloud KMS key below, HTTP load balancing add-on off, Cloud Logging and Monitoring off |
+| GKE cluster (`ryvn-gke-<env>`) | 1 | Regional, private nodes, private control plane endpoint (Ryvn bootstraps through the DNS-based endpoint, gated by IAM), VPC-native, Workload Identity enabled, Dataplane V2 (optional), [secrets encryption](#secrets-encryption), HTTP load balancing add-on off, system and control-plane logs in Cloud Logging, system metrics in Cloud Monitoring, Managed Service for Prometheus off |
 | Node pool `system` | 1 | `e2-standard-2`, autoscaling 1 to 2 nodes, 50 GB pd-standard disks, Secure Boot and integrity monitoring, tainted `CriticalAddonsOnly=true:NoSchedule` |
 | Node pool `application` | 1 | `e2-standard-4`, autoscaling 2 to 5 nodes, 50 GB pd-standard disks, Secure Boot and integrity monitoring |
 | Node service account | 1 | Attached to all node pools, with `roles/container.defaultNodeServiceAccount`, `roles/monitoring.metricWriter` and `roles/stackdriver.resourceMetadata.writer` |
 
 ## Secrets encryption
 
+Ryvn creates a Cloud KMS key by default. If you supply an existing key or use
+Google's default encryption, Ryvn creates neither a key ring nor a key.
+
 | Resource | Count | Description |
 |----------|-------|-------------|
-| Cloud KMS key ring (`ryvn-gke-<env>-<hex>`) | 1 | Regional |
-| Cloud KMS key (`ryvn-gke-<env>-secrets`) | 1 | Symmetric, rotation enabled, with `roles/cloudkms.cryptoKeyEncrypterDecrypter` granted to the GKE service agent. Rings and keys cannot be deleted, so deprovisioning disables rotation and schedules the key versions for destruction |
+| Cloud KMS key ring (`ryvn-gke-<env>-<hex>`) | 0 or 1 | Regional |
+| Cloud KMS key (`ryvn-gke-<env>-secrets`) | 0 or 1 | Symmetric, rotation enabled, with `roles/cloudkms.cryptoKeyEncrypterDecrypter` granted to the GKE service agent. See [deprovisioning](../permissions/README.md#deprovisioning) for cleanup behavior |
 
 ## Identity and access
 
@@ -53,10 +56,12 @@ by the `ryvn-provisioner` service account, and names carry the environment name 
 
 ## DNS
 
+Ryvn creates these zones and the CAA record unless you skip DNS provisioning.
+
 | Resource | Count | Description |
 |----------|-------|-------------|
-| Public managed zone | 1 | Environment domain, with a CAA record restricting certificate issuance to Let's Encrypt |
-| Private managed zone | 1 | Internal names, bound to the VPC |
+| Public managed zone | 0 or 1 | Environment domain, with a CAA record restricting certificate issuance to Let's Encrypt and Google Trust Services (`pki.goog`) |
+| Private managed zone | 0 or 1 | Internal names, bound to the VPC |
 
 ## Not created by the provisioner
 
