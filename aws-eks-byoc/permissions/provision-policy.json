@@ -149,6 +149,17 @@
         "sts:GetCallerIdentity"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "NodeGroupLaunchTemplateAuthorization",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": "*",
+      "Condition": {
+        "ArnLike": {
+          "ec2:LaunchTemplate": "arn:*:ec2:*:*:launch-template/*"
+        }
+      }
     }
   ]
 }

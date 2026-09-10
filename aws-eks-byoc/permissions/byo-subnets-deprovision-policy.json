@@ -37,6 +37,7 @@
         "ec2:DescribeSecurityGroups",
         "ec2:DescribeSubnets",
         "ec2:DescribeTags",
+        "ec2:DescribeTransitGatewayVpcAttachments",
         "ec2:DescribeVpcAttribute",
         "ec2:DescribeVpcs",
         "eks:DeleteAccessEntry",

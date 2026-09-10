@@ -79,6 +79,7 @@
         "ec2:DescribeSecurityGroups",
         "ec2:DescribeSubnets",
         "ec2:DescribeTags",
+        "ec2:DescribeTransitGatewayVpcAttachments",
         "ec2:DescribeVpcAttribute",
         "ec2:DescribeVpcs",
         "ec2:ModifyLaunchTemplate",
@@ -187,6 +188,17 @@
         "sts:GetCallerIdentity"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "NodeGroupLaunchTemplateAuthorization",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": "*",
+      "Condition": {
+        "ArnLike": {
+          "ec2:LaunchTemplate": "arn:*:ec2:*:*:launch-template/*"
+        }
+      }
     }
   ]
 }
