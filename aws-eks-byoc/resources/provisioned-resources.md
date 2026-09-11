@@ -18,6 +18,7 @@ Resources created by the Ryvn platform blueprint during environment provisioning
 | Route Tables | 3 | Public (IGW route), private (NAT route), intra (local only) |
 | Route Table Associations | 9 | One per subnet (3 public + 3 private + 3 intra) |
 | Routes | 2 | Public → IGW, private → NAT |
+| S3 Gateway Endpoint | 1 | Attached to the private route table, which gains a route for the region's S3 prefix list. Sends S3 traffic (including ECR image layers) over the AWS backbone instead of the NAT gateway, at no charge |
 | Default Network ACL | 1 | VPC default NACL (managed to prevent drift) |
 | Default Route Table | 1 | VPC default route table (managed to prevent drift) |
 
