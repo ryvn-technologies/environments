@@ -4,6 +4,7 @@
     {
       "Effect": "Allow",
       "Action": [
+        "ec2:DeleteFlowLogs",
         "ec2:DeleteInternetGateway",
         "ec2:DeleteLaunchTemplate",
         "ec2:DeleteLaunchTemplateVersions",
@@ -19,6 +20,7 @@
         "ec2:DescribeAddresses",
         "ec2:DescribeAddressesAttribute",
         "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeFlowLogs",
         "ec2:DescribeInternetGateways",
         "ec2:DescribeLaunchTemplateVersions",
         "ec2:DescribeLaunchTemplates",
