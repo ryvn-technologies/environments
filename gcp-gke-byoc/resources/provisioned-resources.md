@@ -47,8 +47,9 @@ Google's default encryption, Ryvn creates neither a key ring nor a key.
 | Resource | Count | Description |
 |----------|-------|-------------|
 | Service account `ryvn-agent-<hex>` | 1 | Identity of the in-cluster Ryvn agent, bound to the Kubernetes service account `ryvn-system/ryvn-agent` through `roles/iam.workloadIdentityUser` |
-| Custom role `ryvn_agent_role_<env>` | 1 | Project-level permissions the agent needs to install Ryvn-managed services (Cloud SQL, Memorystore, Cloud Storage, service accounts, custom roles) |
-| Custom role `ryvn_agent_cloudsql_role_<env>` | 1 | Cloud SQL permissions, bound with an IAM condition on the tag below so the agent only manages instances it created |
+| Custom role `ryvn_agent_role_<env>` | 0 or 1 | Project-level permissions the agent needs to install Ryvn-managed services (Cloud SQL, Memorystore, Cloud Storage, service accounts, custom roles). Setting `terraform_executor_policies` in the environment replaces the default grants: this role then carries the supplied `permissions`, or is absent when only `roles` and `bindings` are supplied |
+| Custom role `ryvn_agent_cloudsql_role_<env>` | 0 or 1 | Cloud SQL permissions, bound with an IAM condition on the tag below so the agent only manages instances it created. Absent when `terraform_executor_policies` is set |
+| Custom role `ryvn_agent_<env>_<name>` | 0 or more | One per `terraform_executor_policies.bindings` entry that supplies `permissions`, bound with that entry's IAM condition if any |
 | Tag key and value (`ryvn-managed`) | 1 each | Scopes the conditional Cloud SQL binding |
 | Service account `external-dns-<hex>` | 1 | Bound through Workload Identity, with `roles/dns.admin` for managing DNS records |
 | Service account `cert-manager-<hex>` | 1 | Bound through Workload Identity, with `roles/dns.admin` for DNS-01 certificate challenges |
