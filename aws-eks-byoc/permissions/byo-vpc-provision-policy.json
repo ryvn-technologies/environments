@@ -183,6 +183,7 @@
         "sqs:ListQueueTags",
         "sqs:SetQueueAttributes",
         "sqs:TagQueue",
+        "ssm:DescribeParameters",
         "ssm:GetParameter",
         "ssm:GetParameters",
         "sts:GetCallerIdentity"
@@ -199,6 +200,29 @@
           "ec2:LaunchTemplate": "arn:*:ec2:*:*:launch-template/*"
         }
       }
+    },
+    {
+      "Sid": "RyvnInitCodeBuildProject",
+      "Effect": "Allow",
+      "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:BatchGetProjects",
+        "codebuild:CreateProject",
+        "codebuild:StartBuild",
+        "codebuild:UpdateProject"
+      ],
+      "Resource": "arn:*:codebuild:*:*:project/ryvn-init-*"
+    },
+    {
+      "Sid": "RyvnInitResultParameter",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:AddTagsToResource",
+        "ssm:ListTagsForResource",
+        "ssm:PutParameter",
+        "ssm:RemoveTagsFromResource"
+      ],
+      "Resource": "arn:*:ssm:*:*:parameter/ryvn/*/ryvn-init/*"
     }
   ]
 }

@@ -141,11 +141,30 @@
         "sqs:GetQueueAttributes",
         "sqs:ListQueueTags",
         "sqs:SetQueueAttributes",
+        "ssm:DescribeParameters",
         "ssm:GetParameter",
         "ssm:GetParameters",
         "sts:GetCallerIdentity"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "RyvnInitCodeBuildProject",
+      "Effect": "Allow",
+      "Action": [
+        "codebuild:BatchGetProjects",
+        "codebuild:DeleteProject"
+      ],
+      "Resource": "arn:*:codebuild:*:*:project/ryvn-init-*"
+    },
+    {
+      "Sid": "RyvnInitResultParameter",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:DeleteParameter",
+        "ssm:ListTagsForResource"
+      ],
+      "Resource": "arn:*:ssm:*:*:parameter/ryvn/*/ryvn-init/*"
     }
   ]
 }
