@@ -75,6 +75,7 @@
         "eks:TagResource",
         "eks:UpdateAddon",
         "eks:UpdateClusterConfig",
+        "eks:UpdateClusterVersion",
         "eks:UpdateNodegroupConfig",
         "eks:UpdateNodegroupVersion",
         "events:DescribeRule",
