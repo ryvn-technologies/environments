@@ -27,6 +27,7 @@
         "ec2:DescribeAddresses",
         "ec2:DescribeAddressesAttribute",
         "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeInstances",
         "ec2:DescribeInternetGateways",
         "ec2:DescribeLaunchTemplateVersions",
         "ec2:DescribeLaunchTemplates",
@@ -143,6 +144,17 @@
         "ssm:ListTagsForResource"
       ],
       "Resource": "arn:*:ssm:*:*:parameter/ryvn/*/ryvn-init/*"
+    },
+    {
+      "Sid": "TerminateRunner",
+      "Effect": "Allow",
+      "Action": "ec2:TerminateInstances",
+      "Resource": "arn:${partition}:ec2:${region}:${account_id}:instance/*",
+      "Condition": {
+        "ArnLike": {
+          "ec2:InstanceProfile": "arn:${partition}:iam::${account_id}:instance-profile/cluster-bootstrap/runner/*"
+        }
+      }
     }
   ]
 }
