@@ -19,10 +19,11 @@ Open your environment in the Ryvn dashboard and run the setup commands it provid
 Sign in to gcloud as an owner of the target project. The commands create the service
 account and grant the roles for your Ryvn instance.
 
-You can also get the setup commands with the Ryvn CLI. Replace `my-project` with your project ID:
+You can also get the setup commands with the Ryvn CLI once the environment has its project saved.
+Replace `my-environment` with your environment name:
 
 ```bash
-ryvn get gcp-setup-script --project my-project
+ryvn get setup-script -e my-environment
 ```
 
 ## What the permissions are for
